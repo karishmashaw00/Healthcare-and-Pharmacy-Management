@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Support - Healthcare & Pharmacy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0; padding: 20px;
+      background-color: #f9f9f9;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #0077cc;
+    }
+
+    section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    section h2 {
+      margin-top: 0;
+      color: #005fa3;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    .faq-item {
+      margin-bottom: 10px;
+      padding: 10px;
+      background: #f1f1f1;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 10px;
+      background: #e0e0e0;
+      margin-top: 5px;
+      border-radius: 6px;
+    }
+
+    .stars {
+      display: flex;
+      gap: 8px;
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .star {
+      color: gray;
+    }
+
+    .star.selected {
+      color: gold;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      section {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Customer Support</h1>
+
+  <!-- Call Support / Request Callback -->
+  <!-- <section>
+    <h2>📞 Request a Call Back</h2>
+    
+  </section> -->
+
+  <!-- Issue Reporting (Defective Product) -->
+  <section>
+    <h2>🛠️ Report an Issue</h2>
+    <form id="callbackForm">
+      <label for="customerName">Your Name</label>
+      <input type="text" id="customerName" required>
+
+      <label for="customerPhone">Phone Number</label>
+      <input type="tel" id="customerPhone" required>
+<!-- 
+      <button type="submit">Request Call Back</button> -->
+    </form>
+    <form id="issueForm">
+    
+      <label for="issueDetails">Describe the Issue</label>
+      <textarea id="issueDetails" rows="4" required></textarea>
+
+      <button type="submit">Submit Issue</button>
+    </form>
+  </section>
+
+ 
+
+  <!-- Feedback & Rating System -->
+  <section>
+    <h2>🌟 Give Feedback</h2>
+    <form id="feedbackForm">
+      <label for="feedbackText">Your Feedback</label>
+      <textarea id="feedbackText" rows="3" required></textarea>
+
+      <label>Rate our Service</label>
+      <div class="stars" id="starRating">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
+      </div>
+
+      <button type="submit">Submit Feedback</button>
+    </form>
+  </section>
+
+  <script>
+    // FAQs Toggle
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const answer = item.querySelector('.faq-answer');
+        answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
+      });
+    });
+
+    // Star Rating
+    const stars = document.querySelectorAll('.star');
+    let selectedRating = 0;
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        selectedRating = star.getAttribute('data-value');
+        stars.forEach(s => s.classList.remove('selected'));
+        for (let i = 0; i < selectedRating; i++) {
+          stars[i].classList.add('selected');
+        }
+      });
+    });
+
+    // Handle CallBack Form
+    document.getElementById('callbackForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("Thank you! Our support team will call you shortly.");
+      this.reset();
+    });
+
+    // Handle Issue Reporting
+    document.getElementById('issueForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert("Your issue has been reported. Our team will contact you soon.");
+      this.reset();
+    });
+
+    // Handle Feedback Form
+    document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert(`Thank you for your feedback! You rated us ${selectedRating} stars.`);
+      this.reset();
+      stars.forEach(s => s.classList.remove('selected'));
+    });
+  </script>
+
+</body>
+</html>

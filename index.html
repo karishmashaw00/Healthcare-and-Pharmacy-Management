@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h2>Healthcare and Pharmacy Management</h2>
+        <button class="close-btn" id="closeBtn">&times;</button>
+      </div>
+      <ul>
+        <li class="active"><i class="fa fa-solid fa-chart-simple"></i>Dashboard</li>
+        <li><a href="appointment.html" class="sidebar-btn"><i class="fa fa-calendar-plus-o"></i>Appointment</a></li>
+        <li><a href="orders.html" class="sidebar-btn"><i class="fa fa-solid fa-cart-shopping"></i>Orders</a></li>
+        <li><a href="test.html" class="sidebar-btn"><i class="fa fa-heartbeat"></i>Test</a></li>
+        <li><a href="support.html" class="sidebar-btn"><i class="fa fa-solid fa-comment"></i>Support</a></li>
+      </ul>
+      
+       <!-- Logout button -->
+       <button id="logoutBtn" class="logout-btn">Logout</button>
+    </aside>
+    
+
+    <main class="main-content">
+      <header>
+        <button class="toggle-btn" id="toggleBtn">&#9776;</button>
+        <h1>Dashboard Overview</h1>
+       
+      </header>
+
+      <!-- Analytics -->
+
+      <section class="cards">
+        <div class="card">
+          <h3>Total Sales</h3>
+          <p id="totalSalesDisplay">₹0</p>
+        </div>
+        <div class="card">
+          <h3>Total Appointment</h3>
+          <p id="totalAppointmentsCount">0</p>
+        </div>
+        <div class="card">
+          <h3>Total Orders</h3>
+          <p id="totalOrdersCount">0</p>
+        </div>
+        <div class="card">
+          <h3>Total Doctors</h3>
+          <p id="totalDoctorsCount">0</p>
+        </div>
+        <div class="card">
+          <h3>Total Product</h3>
+          <p id="totalProductCount">0</p>
+        </div>
+        <div class="card">
+          <h3>Total Test</h3>
+          <p id="totalTestCount">0</p>
+        </div>
+      </section>
+
+
+
+<!-- Doctors Section -->
+<section class="doctor-section">
+  <div class="section-header">
+    <h2>Doctors Available</h2>
+    <button id="addDoctorBtn">Add Doctor</button>
+  </div>
+
+  <div class="doctor-slider" id="doctorSlider">
+    <!-- Doctor cards will be added here -->
+  </div>
+</section>
+
+<!-- Add Doctor Modal -->
+<div class="modal" id="addDoctorModal">
+  <div class="modal-content">
+    <span class="close" id="closeModal">&times;</span>
+    <h3>Add New Doctor</h3>
+    <form id="doctorForm">
+      <input type="text" id="docName" placeholder="Doctor Name" required />
+  <input type="text" id="docSpecialization" placeholder="Specialization" required />
+  <input type="url" id="docImage" placeholder="Photo URL" required />
+  <input type="number" id="docFees" placeholder="Fees (₹)" required />
+  <textarea id="docDescription" placeholder="Description" required></textarea>
+      <button type="submit">Add Doctor</button>
+    </form>
+  </div>
+</div>
+
+
+
+
+
+
+
+<!-- Product Available  Section -->
+      <section class="product-available-section">
+        <div class="section-header">
+          <h2>Products Available</h2>
+          <button id="addProductBtn">Add Product</button>
+        </div>
+      
+        <div class="product-slider" id="productSlider">
+          <!-- Product cards will be added here -->
+        </div>
+      </section>
+      
+      <!-- Add/Edit Product Modal -->
+      <div class="modal" id="addProductModal">
+        <div class="modal-content">
+          <span class="close" id="closeProductModal">&times;</span>
+          <h3 id="productModalTitle">Add Product</h3>
+          <form id="productForm">
+            <input type="text" id="productName" placeholder="Product Name" required />
+            <textarea id="productDescription" placeholder="Description" required></textarea>
+            <input type="text" id="productManufacturer" placeholder="Manufacturer" required />
+            <input type="text" id="productImageURL" placeholder="Image URL" required />
+            <input type="number" id="productMRP" placeholder="MRP" required />
+            <input type="number" id="productRate" placeholder="Rate" required />
+            <input type="text" id="productVolume" placeholder="Volume (eg: 100ml, 10tabs)" required />
+            <button type="submit">Save</button>
+          </form>
+        </div>
+      </div>      
+     
+      
+  
+    </main>
+  </div>
+
+
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

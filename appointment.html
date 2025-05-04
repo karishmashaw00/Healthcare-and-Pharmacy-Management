@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Appointments</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    .no-data {
+      text-align: center;
+      font-style: italic;
+      color: gray;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 8px;
+        background: #f9f9f9;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 5px;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #444;
+        width: 50%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Doctor Appointments</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Doctor ID</th>
+        <th>Doctor Name</th>
+        <th>Patient Name</th>
+        <th>Gender</th>
+        <th>Phone No</th>
+        <th>Time Slot</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="appointmentsTableBody">
+      <!-- Appointments will be inserted here -->
+    </tbody>
+  </table>
+
+  <button class="back-btn" id="backBtn">← Back to Dashboard</button>
+
+  <script type="module">
+    // Import Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, query, orderBy 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+  
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyAw3F_kTHJWj5JEhzTmHm3LZdXZHLbO2Ww",
+      authDomain: "healthcare-app-81435.firebaseapp.com",
+      projectId: "healthcare-app-81435",
+      storageBucket: "healthcare-app-81435.firebasestorage.app",
+      messagingSenderId: "989328393742",
+      appId: "1:989328393742:web:793ac2fbdd8a1dd830de5f"
+    };
+  
+    // Initialize Firebase App & Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const appointmentsCollection = collection(db, "appointments");
+  
+    // Load data on DOM load
+    window.addEventListener("DOMContentLoaded", async () => {
+      const tableBody = document.getElementById("appointmentsTableBody");
+      tableBody.innerHTML = "";
+  
+      try {
+        const q = query(appointmentsCollection, orderBy("timeStamp", "desc"));
+        const querySnapshot = await getDocs(q);
+  
+        if (querySnapshot.empty) {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td class="no-data" colspan="8">No appointments available</td>`;
+          tableBody.appendChild(row);
+          return;
+        }
+  
+        const appointmentsArray = [];
+  
+        querySnapshot.forEach((doc) => {
+          const appt = doc.data();
+          appointmentsArray.push(appt);
+  
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td data-label="Date">${appt.date || "-"}</td>
+            <td data-label="Doctor ID">${appt.doctorId || "-"}</td>
+            <td data-label="Doctor Name">${appt.doctorName || "-"}</td>
+            <td data-label="Patient Name">${appt.patientName || "-"}</td>
+            <td data-label="Gender">${appt.patientGender || "-"}</td>
+            <td data-label="Phone No">${appt.patientPhoneNo || "-"}</td>
+            <td data-label="Time Slot">${appt.timeSlot || "-"}</td>
+            <td data-label="Timestamp">${appt.timeStamp || "-"}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+  
+        // 🔄 Store in localStorage for dashboard use
+        localStorage.setItem("appointments", JSON.stringify(appointmentsArray));
+        
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    });
+  
+    // Back to Dashboard
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+  
+</body>
+</html>
