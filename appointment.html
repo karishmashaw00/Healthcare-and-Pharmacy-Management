@@ -111,13 +111,14 @@
   
     // Your Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyAw3F_kTHJWj5JEhzTmHm3LZdXZHLbO2Ww",
-      authDomain: "healthcare-app-81435.firebaseapp.com",
-      projectId: "healthcare-app-81435",
-      storageBucket: "healthcare-app-81435.firebasestorage.app",
-      messagingSenderId: "989328393742",
-      appId: "1:989328393742:web:793ac2fbdd8a1dd830de5f"
-    };
+  apiKey: "AIzaSyDF6cOt8GqGNa3n3WSDx_UXjuLvDFL2_ow",
+  authDomain: "ramkrishna-pharmacy.firebaseapp.com",
+  projectId: "ramkrishna-pharmacy",
+  storageBucket: "ramkrishna-pharmacy.firebasestorage.app",
+  messagingSenderId: "658048554480",
+  appId: "1:658048554480:web:ea82a8a8f82590eef53935",
+  measurementId: "G-P0K9JN0D0L"
+};
   
     // Initialize Firebase App & Firestore
     const app = initializeApp(firebaseConfig);
@@ -130,7 +131,8 @@
       tableBody.innerHTML = "";
   
       try {
-        const q = query(appointmentsCollection, orderBy("timeStamp", "desc"));
+        // const q = query(appointmentsCollection, orderBy("timeStamp", "desc"));
+        const q = query(appointmentsCollection);
         const querySnapshot = await getDocs(q);
   
         if (querySnapshot.empty) {
@@ -144,8 +146,10 @@
   
         querySnapshot.forEach((doc) => {
           const appt = doc.data();
+          // console.log("Loaded appointment:", appt);
+          
           appointmentsArray.push(appt);
-  
+ 
           const row = document.createElement("tr");
           row.innerHTML = `
             <td data-label="Date">${appt.date || "-"}</td>
@@ -153,14 +157,28 @@
             <td data-label="Doctor Name">${appt.doctorName || "-"}</td>
             <td data-label="Patient Name">${appt.patientName || "-"}</td>
             <td data-label="Gender">${appt.patientGender || "-"}</td>
-            <td data-label="Phone No">${appt.patientPhoneNo || "-"}</td>
+            <td data-label="Phone No">${appt.patientPhNo || "-"}</td>
             <td data-label="Time Slot">${appt.timeSlot || "-"}</td>
-            <td data-label="Timestamp">${appt.timeStamp || "-"}</td>
+            <td data-label="Timestamp">
+  ${
+    appt.timestamp
+      ? typeof appt.timestamp.toDate === 'function'
+        ? appt.timestamp.toDate().toLocaleString()
+        : new Date(appt.timestamp).toLocaleString()
+      : "-"
+  }
+</td>
+
+
           `;
+          
           tableBody.appendChild(row);
+
+          
         });
+       
   
-        // 🔄 Store in localStorage for dashboard use
+        //  Store in localStorage for dashboard use
         localStorage.setItem("appointments", JSON.stringify(appointmentsArray));
         
       } catch (error) {

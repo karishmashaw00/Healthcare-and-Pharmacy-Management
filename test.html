@@ -134,26 +134,28 @@
   
     // Your Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyAw3F_kTHJWj5JEhzTmHm3LZdXZHLbO2Ww",
-      authDomain: "healthcare-app-81435.firebaseapp.com",
-      projectId: "healthcare-app-81435",
-      storageBucket: "healthcare-app-81435.firebasestorage.app",
-      messagingSenderId: "989328393742",
-      appId: "1:989328393742:web:793ac2fbdd8a1dd830de5f"
-    };
+  apiKey: "AIzaSyDF6cOt8GqGNa3n3WSDx_UXjuLvDFL2_ow",
+  authDomain: "ramkrishna-pharmacy.firebaseapp.com",
+  projectId: "ramkrishna-pharmacy",
+  storageBucket: "ramkrishna-pharmacy.firebasestorage.app",
+  messagingSenderId: "658048554480",
+  appId: "1:658048554480:web:ea82a8a8f82590eef53935",
+  measurementId: "G-P0K9JN0D0L"
+};
   
     // Initialize Firebase App & Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
    
-    const testsCollection = collection(db, "tests");
+    const testsCollection = collection(db, "lab_tests");
 
   window.addEventListener("DOMContentLoaded", async () => {
     const tableBody = document.getElementById("testTableBody");
     tableBody.innerHTML = "";
 
     try {
-      const q = query(testsCollection, orderBy("timeStamp", "desc"));
+      const q = query(testsCollection);
+      
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {
@@ -173,7 +175,7 @@
         row.innerHTML = `
           <td data-label="Name">${test.name || "-"}</td>
           <td data-label="Address">${test.address || "-"}</td>
-          <td data-label="Phone No">${test.phoneNo || "-"}</td>
+          <td data-label="Phone No">${test.phone || "-"}</td>
           <td data-label="Category">${test.category || "-"}</td>
           <td data-label="Date">${test.date || "-"}</td>
           <td data-label="Place">${test.place || "-"}</td>
@@ -183,7 +185,15 @@
               : 'N/A'}
           </td>
           <td data-label="Time Slot">${test.timeSlot || "-"}</td>
-          <td data-label="Timestamp">${test.timeStamp || "-"}</td>
+          <td data-label="Timestamp">
+  ${
+    test.timestamp
+      ? typeof test.timestamp.toDate === 'function'
+        ? test.timestamp.toDate().toLocaleString()
+        : new Date(test.timestamp).toLocaleString()
+      : "-"
+  }
+</td>
         `;
         tableBody.appendChild(row);
       });

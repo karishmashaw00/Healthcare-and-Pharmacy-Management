@@ -126,13 +126,14 @@
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAw3F_kTHJWj5JEhzTmHm3LZdXZHLbO2Ww",
-      authDomain: "healthcare-app-81435.firebaseapp.com",
-      projectId: "healthcare-app-81435",
-      storageBucket: "healthcare-app-81435.appspot.com",
-      messagingSenderId: "989328393742",
-      appId: "1:989328393742:web:793ac2fbdd8a1dd830de5f"
-    };
+  apiKey: "AIzaSyDF6cOt8GqGNa3n3WSDx_UXjuLvDFL2_ow",
+  authDomain: "ramkrishna-pharmacy.firebaseapp.com",
+  projectId: "ramkrishna-pharmacy",
+  storageBucket: "ramkrishna-pharmacy.firebasestorage.app",
+  messagingSenderId: "658048554480",
+  appId: "1:658048554480:web:ea82a8a8f82590eef53935",
+  measurementId: "G-P0K9JN0D0L"
+};
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -143,7 +144,7 @@
       tableBody.innerHTML = "";
 
       try {
-        const q = query(ordersCollection, orderBy("timeStamp", "desc"));
+        const q = query(ordersCollection);
         const querySnapshot = await getDocs(q);
 
         if (querySnapshot.empty) {
@@ -167,13 +168,26 @@
           row.innerHTML = `
             <td data-label="Name">${order.name || "-"}</td>
             <td data-label="Address">${order.address || "-"}</td>
-            <td data-label="Phone No">${order.phoneNo || "-"}</td>
+            <td data-label="Phone No">${order.phno || "-"}</td>
             <td data-label="Payment Method">${order.paymentMethod || "-"}</td>
-            <td data-label="Products"><ul>${products.map(p => `<li>${p}</li>`).join('')}</ul></td>
-            <td data-label="Timestamp">${order.timeStamp || "-"}</td>
+            <td data-label="Products">
+  <ul>
+    ${products.map(p => `<li>${p.productName || "-"} (Qty: ${p.quantity || 0}, ₹${p.price || 0})</li>`).join('')}
+  </ul>
+</td>
+
+            <td data-label="Timestamp">
+  ${
+    order.timestamp
+      ? typeof order.timestamp.toDate === 'function'
+        ? order.timestamp.toDate().toLocaleString()
+        : new Date(order.timestamp).toLocaleString()
+      : "-"
+  }
+</td>
             <td data-label="Total Amount">₹${order.totalAmount || 0}</td>
             <td data-label="Payment Status">${order.paymentStatus || "Pending"}</td>
-            <td data-label="User ID">${order.userId || "-"}</td>
+            <td data-label="User ID">${order.userID || "-"}</td>
           `;
           tableBody.appendChild(row);
         });

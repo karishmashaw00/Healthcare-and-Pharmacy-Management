@@ -16,11 +16,12 @@ body, html {
 }
 
 .sidebar {
-  width: 220px;
+  width: 300px;
   background-color: #1e1e2f;
   color: #fff;
   padding: 20px;
   transition: transform 0.3s ease;
+
 }
 
 .sidebar h2 {
@@ -36,6 +37,8 @@ body, html {
   padding: 12px;
   cursor: pointer;
   border-radius: 4px;
+  display: flex;
+  font-size: 14px;
 }
 
 .sidebar ul li:hover,
@@ -45,7 +48,7 @@ body, html {
 }
 
 .fa{
-margin: 8px;
+margin: 5px;
 
 }
 
@@ -139,7 +142,7 @@ header h1 {
     height: 100%;
     transform: translateX(-100%);
     z-index: 999;
-    width: 220px;
+    width: 250px;
     transition: transform 0.3s ease;
   }
 
@@ -198,16 +201,50 @@ header h1 {
   padding-bottom: 10px;
 }
 
+
 .product-card {
-  min-width: 220px;
-  background: #fff;
-  border-radius: 10px;
+  min-width: 200px;
+  border: 1px solid #ccc;
+  /* padding: 1rem; */
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   padding: 16px;
-  text-align: center;
-  flex-shrink: 0;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: #fff;
 }
+
+/* Show more option in product card */
+.product-card .toggle-description {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.product-card.expanded {
+  min-height: 120px; /* taller when expanded */
+
+}
+
+.product-card .full-text {
+  display: none;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.product-card .show-more-visible .short-text {
+  display: none;
+}
+
+.product-card .show-more-visible .full-text {
+  display: block;
+}
+
 
 .product-card img {
   width: 100%;
@@ -241,6 +278,8 @@ header h1 {
   font-size: 16px;
   margin-right: 8px;
 }
+
+
 
 .card-actions {
   margin-top: 8px;
@@ -286,6 +325,9 @@ header h1 {
 .delete-btn i {
   font-size: 14px;
 }
+
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
