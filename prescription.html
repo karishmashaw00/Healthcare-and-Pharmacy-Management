@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prescription Order Details</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .no-data {
+      text-align: center;
+      font-style: italic;
+      color: gray;
+    }
+
+    .back-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    ul {
+      padding-left: 16px;
+      margin: 0;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 6px;
+        background-color: #fafafa;
+      }
+
+      td {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 5px;
+        border: none;
+        border-bottom: 1px solid #eee;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        width: 45%;
+        color: #444;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>Prescription Orders Details</h2>
+
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Address</th>
+          <th>Phone No</th>
+          <th>Option</th>
+          <th>Prescription</th>
+          <th>Timestamp</th>
+          <th>User ID</th>
+        </tr>
+      </thead>
+      <tbody id="orderTableBody">
+        <!-- Data will be injected here -->
+      </tbody>
+    </table>
+  </div>
+
+  <button class="back-btn" id="backBtn">← Back to Dashboard</button>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, query, orderBy 
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyDF6cOt8GqGNa3n3WSDx_UXjuLvDFL2_ow",
+  authDomain: "ramkrishna-pharmacy.firebaseapp.com",
+  projectId: "ramkrishna-pharmacy",
+  storageBucket: "ramkrishna-pharmacy.firebasestorage.app",
+  messagingSenderId: "658048554480",
+  appId: "1:658048554480:web:ea82a8a8f82590eef53935",
+  measurementId: "G-P0K9JN0D0L"
+};
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const ordersCollection = collection(db, "prescription_orders");
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      const tableBody = document.getElementById("orderTableBody");
+      tableBody.innerHTML = "";
+
+      try {
+        const q = query(ordersCollection);
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td class="no-data" colspan="9">No orders available</td>`;
+          tableBody.appendChild(row);
+          return;
+        }
+
+        const ordersArray = [];
+
+        querySnapshot.forEach(doc => {
+          const order = doc.data();
+          ordersArray.push(order);
+
+          const products = Array.isArray(order.products) ? order.products : [];
+
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td data-label="Name">${order.name || "-"}</td>
+            <td data-label="Address">${order.address || "-"}</td>
+            <td data-label="Phone No">${order.phone || "-"}</td>
+            <td data-label="Option">${order.option || "-"}</td>
+ <td data-label="Prescription">
+            ${order.prescriptionUrl 
+              ? `<a href="${order.prescriptionUrl}" target="_blank">View</a>` 
+              : 'N/A'}
+          </td>
+            <td data-label="Timestamp">
+  ${
+    order.timestamp
+      ? typeof order.timestamp.toDate === 'function'
+        ? order.timestamp.toDate().toLocaleString()
+        : new Date(order.timestamp).toLocaleString()
+      : "-"
+  }
+</td>
+            <td data-label="User ID">${order.userId || "-"}</td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+        // localStorage.setItem("orders", JSON.stringify(ordersArray));
+       
+
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    });
+
+    document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
