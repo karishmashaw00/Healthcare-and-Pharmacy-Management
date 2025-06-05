@@ -58,6 +58,31 @@
       margin: 0;
     }
 
+    .delivery-status-dropdown {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 150px;
+}
+
+.delivery-status-dropdown:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #fff;
+}
+
+.delivery-status-dropdown option {
+  background-color: #fff;
+  color: #333;
+}
+
+
+
     /* Responsive Styling */
     @media (max-width: 768px) {
       table, thead, tbody, th, td, tr {
@@ -107,8 +132,9 @@
           <th>Products</th>
           <th>Timestamp</th>
           <th>Total Amount</th>
-          <th>Payment Status</th>
+          <th>Payment Status</th> 
           <th>User ID</th>
+          <th>Delivery Status</th>
         </tr>
       </thead>
       <tbody id="orderTableBody">
@@ -122,7 +148,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import {
-      getFirestore, collection, getDocs, query, orderBy 
+      getFirestore, collection, getDocs, query, orderBy, updateDoc, doc 
     } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -165,6 +191,9 @@
           const products = Array.isArray(order.products) ? order.products : [];
 
           const row = document.createElement("tr");
+          const deliveryStatus = order.deliveryStatus || "Not Dispatched";
+const statusOptions = ["Not Dispatched", "Dispatched", "Out for Delivery", "Delivered"];
+
           row.innerHTML = `
             <td data-label="Name">${order.name || "-"}</td>
             <td data-label="Address">${order.address || "-"}</td>
@@ -188,9 +217,42 @@
             <td data-label="Total Amount">₹${order.totalAmount || 0}</td>
             <td data-label="Payment Status">${order.paymentStatus || "Pending"}</td>
             <td data-label="User ID">${order.userID || "-"}</td>
+            <td data-label="Delivery Status">
+    <select class="delivery-status-dropdown" data-id="${doc.id}">
+      ${statusOptions.map(status =>
+        `<option value="${status}" ${status === deliveryStatus ? "selected" : ""}>${status}</option>`
+      ).join('')}
+    </select>
+  </td>
           `;
           tableBody.appendChild(row);
         });
+
+        //Delivery status update script
+        document.querySelectorAll(".delivery-status-dropdown").forEach(dropdown => {
+  dropdown.addEventListener("change", async (e) => {
+    const newStatus = e.target.value;
+    const docId = e.target.dataset.id;
+
+    // Admin-only check (replace with your real check)
+    const isAdmin = true; // Change this logic as needed
+
+    if (!isAdmin) {
+      alert("Only admins can update delivery status.");
+      return;
+    }
+
+    try {
+      const docRef = doc(db, "orders", docId);
+      await updateDoc(docRef, { deliveryStatus: newStatus });
+      alert("Delivery status updated successfully.");
+    } catch (error) {
+      console.error("Error updating delivery status:", error);
+      alert("Failed to update delivery status.");
+    }
+  });
+});
+
 
         localStorage.setItem("orders", JSON.stringify(ordersArray));
         localStorage.setItem("totalSales", totalSales.toString());
