@@ -198,93 +198,171 @@ const addProductModal = document.getElementById("addProductModal");
 const closeProductModal = document.getElementById("closeProductModal");
 const productForm = document.getElementById("productForm");
 
-let editProductId = null; // Track document ID when editing
+let editProductId = null;
 
-// Load all products from Firebase
-async function renderProducts() {
-  productSlider.innerHTML = "";
-  // const q = query(productCollection, orderBy("timestamp", "desc"));
-  const q = query(productCollection); // no sorting
+let allProducts = [];
+let productsDisplayed = 0;
+let PRODUCTS_PER_BATCH = 3;
+let currentRenderedBatch = 0;
 
+function calculateProductsPerBatch() {
+  const containerWidth = productSlider.offsetWidth;
+  const cardWidth = 270; // Approx width incl margin/padding
+  const newBatch = Math.floor(containerWidth / cardWidth) || 1;
+  
+  // If batch changed, update and re-render
+  if (newBatch !== PRODUCTS_PER_BATCH) {
+    PRODUCTS_PER_BATCH = newBatch;
+    renderVisibleProducts();
+  }
+}
+
+// Listen to resize & adjust product batches without reload
+window.addEventListener("resize", calculateProductsPerBatch);
+
+// Fetch products once from Firebase
+async function fetchAllProducts() {
+  allProducts = [];
+  const q = query(productCollection);
   const querySnapshot = await getDocs(q);
 
   querySnapshot.forEach((docSnap) => {
-    const prod = docSnap.data();
-    const card = document.createElement("div");
-    card.className = "product-card";
-
-    card.innerHTML = `
-  <img src="${prod.imageUrl}" alt="${prod.name}" />
-  <h4>${prod.name}</h4> 
-  <p class="description">
-  <span class="short-text">${prod.description.slice(0, 80)}...</span>
-  <span class="full-text">${prod.description}</span>
-  <button class="toggle-description">Show More</button>
-</p>
-
-  <p><strong>Manufacturer:</strong> ${prod.manufacturer}</p>
-  <p><strong>MRP:</strong> ₹${prod.mrp}</p>
-  <p><strong>Rate:</strong> ₹${prod.rate}</p>
-  <p><strong>Volume:</strong> ${prod.volume}</p>
-  <div class="card-actions">
-    <button class="edit-btn"><i class="fas fa-edit"></i></button>
-    <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
-  </div>
-`;
-
-    // Show more option in Description
-    const toggleBtn = card.querySelector(".toggle-description");
-    if (toggleBtn) {
-      toggleBtn.addEventListener("click", () => {
-        const descriptionP = card.querySelector(".description");
-        const isExpanded = descriptionP.classList.toggle("show-more-visible");
-
-        toggleBtn.textContent = isExpanded ? "Show Less" : "Show More";
-      });
-    }
-
-    // Edit Product
-    card.querySelector(".edit-btn").addEventListener("click", () => {
-      document.getElementById("productId").value = docSnap.id; // Set the product ID as the document ID
-      document.getElementById("productName").value = prod.name;
-      document.getElementById("productDescription").value = prod.description;
-      document.getElementById("productManufacturer").value = prod.manufacturer;
-      document.getElementById("productImageURL").value = prod.imageUrl;
-      document.getElementById("productMRP").value = prod.mrp;
-      document.getElementById("productRate").value = prod.rate;
-      document.getElementById("productVolume").value = prod.volume;
-      document.getElementById("productModalTitle").innerText = "Edit Product";
-      editProductId = docSnap.id;
-      addProductModal.style.display = "flex";
+    allProducts.push({
+      id: docSnap.id,
+      data: docSnap.data(),
     });
-
-    // Delete Product
-    card.querySelector(".delete-btn").addEventListener("click", async () => {
-      await deleteDoc(doc(db, "products", docSnap.id));
-      renderProducts(); // Refresh
-    });
-
-    productSlider.insertBefore(card, productSlider.firstChild);
   });
+
+  productsDisplayed = 0;
+  currentRenderedBatch = 0;
+  productSlider.innerHTML = "";
+  document.getElementById("seeMoreBtn").style.display = "none";
+
+  calculateProductsPerBatch();
+  showNextProducts();
+}
+
+// Show next batch of products
+function showNextProducts() {
+  const nextBatch = allProducts.slice(productsDisplayed, productsDisplayed + PRODUCTS_PER_BATCH);
+  nextBatch.forEach(({ id, data }) => {
+    createProductCard(id, data);
+  });
+
+  productsDisplayed += nextBatch.length;
+  currentRenderedBatch = Math.ceil(productsDisplayed / PRODUCTS_PER_BATCH);
+
+  if (productsDisplayed < allProducts.length) {
+    document.getElementById("seeMoreBtn").style.display = "block";
+  } else {
+    document.getElementById("seeMoreBtn").style.display = "none";
+  }
 
   updateProductCount();
 }
 
-// Open modal to add new product
+// Re-render visible batch on screen resize
+function renderVisibleProducts() {
+  productSlider.innerHTML = "";
+  productsDisplayed = 0;
+
+  for (let i = 0; i < currentRenderedBatch; i++) {
+    const batchStart = i * PRODUCTS_PER_BATCH;
+    const batchEnd = batchStart + PRODUCTS_PER_BATCH;
+    const batch = allProducts.slice(batchStart, batchEnd);
+
+    batch.forEach(({ id, data }) => {
+      createProductCard(id, data);
+    });
+
+    productsDisplayed += batch.length;
+  }
+
+  if (productsDisplayed < allProducts.length) {
+    document.getElementById("seeMoreBtn").style.display = "block";
+  } else {
+    document.getElementById("seeMoreBtn").style.display = "none";
+  }
+}
+
+// Create a single card
+function createProductCard(id, data) {
+  const card = document.createElement("div");
+  card.className = "product-card";
+
+  card.innerHTML = `
+    <img src="${data.imageUrl}" alt="${data.name}" />
+    <h4>${data.name}</h4> 
+    <p class="description">
+      <span class="short-text">${data.description.slice(0, 80)}...</span>
+      <span class="full-text">${data.description}</span>
+      <button class="toggle-description">Show More</button>
+    </p>
+    <p><strong>Manufacturer:</strong> ${data.manufacturer}</p>
+    <p><strong>MRP:</strong> ₹${data.mrp}</p>
+    <p><strong>Rate:</strong> ₹${data.rate}</p>
+    <p><strong>Volume:</strong> ${data.volume}</p>
+    <div class="card-actions">
+      <button class="edit-btn"><i class="fas fa-edit"></i></button>
+      <button class="delete-btn"><i class="fas fa-trash-alt"></i></button>
+    </div>
+  `;
+
+  // Toggle Description
+  const toggleBtn = card.querySelector(".toggle-description");
+  toggleBtn.addEventListener("click", () => {
+    const descriptionP = card.querySelector(".description");
+    const isExpanded = descriptionP.classList.toggle("show-more-visible");
+    toggleBtn.textContent = isExpanded ? "Show Less" : "Show More";
+  });
+
+  // Edit Product
+  card.querySelector(".edit-btn").addEventListener("click", () => {
+    document.getElementById("productId").value = id;
+    document.getElementById("productName").value = data.name;
+    document.getElementById("productDescription").value = data.description;
+    document.getElementById("productManufacturer").value = data.manufacturer;
+    document.getElementById("productImageURL").value = data.imageUrl;
+    document.getElementById("productMRP").value = data.mrp;
+    document.getElementById("productRate").value = data.rate;
+    document.getElementById("productVolume").value = data.volume;
+    document.getElementById("productModalTitle").innerText = "Edit Product";
+    editProductId = id;
+    addProductModal.style.display = "flex";
+  });
+
+  // Delete Product
+  card.querySelector(".delete-btn").addEventListener("click", async () => {
+    await deleteDoc(doc(db, "products", id));
+    fetchAllProducts();
+  });
+
+  productSlider.appendChild(card);
+}
+
+// See More Button
+document.getElementById("seeMoreBtn").addEventListener("click", () => {
+  const slider = document.getElementById("productSlider");
+  slider.classList.add("grid-layout"); // switch to grid layout
+  showNextProducts(); //  load next batch
+});
+
+
+// Add Product Modal
 addProductBtn.addEventListener("click", () => {
   productForm.reset();
   editProductId = null;
   document.getElementById("productModalTitle").innerText = "Add Product";
   addProductModal.style.display = "flex";
-  productId.disabled = false;
+  document.getElementById("productId").disabled = false;
 });
 
-// Close modal
+// Close Modal
 closeProductModal.addEventListener("click", () => {
   addProductModal.style.display = "none";
 });
 
-// Submit form to add or update product
+// Submit Product Form
 productForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -296,29 +374,23 @@ productForm.addEventListener("submit", async (e) => {
     mrp: document.getElementById("productMRP").value,
     rate: document.getElementById("productRate").value,
     volume: document.getElementById("productVolume").value,
-    timestamp: new Date(), // Add timestamp for sorting
+    timestamp: new Date(),
   };
 
-  const productId = document.getElementById("productId").value; // Take productId from the input field
+  const productId = document.getElementById("productId").value;
 
   try {
-      const productRef = doc(db, "products", productId); // Create doc reference with productId as document ID
-      await setDoc(productRef, newProduct); // Manually set the product data
-    
-
+    const productRef = doc(db, "products", productId);
+    await setDoc(productRef, newProduct);
     productForm.reset();
     addProductModal.style.display = "none";
     document.getElementById("productModalTitle").innerText = "Add Product";
-    renderProducts(); // Refresh the UI
+    fetchAllProducts();
   } catch (err) {
     console.error("Error saving product:", err);
     alert("Failed to save product. Try again.");
   }
 });
-
-
-
-
 
 // Update product count
 function updateProductCount() {
@@ -330,8 +402,8 @@ function updateProductCount() {
   }
 }
 
-//  Load on page
-window.addEventListener("DOMContentLoaded", renderProducts);
+// Load on page
+window.addEventListener("DOMContentLoaded", fetchAllProducts);
 
 
 

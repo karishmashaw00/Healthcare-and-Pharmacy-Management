@@ -87,6 +87,17 @@
       color: gold;
     }
 
+ .back-btn {
+  width: 20%;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
     @media (max-width: 768px) {
       body {
         padding: 10px;
@@ -103,6 +114,8 @@
 
   <h1>Customer Support</h1>
 
+   <button class="back-btn" id="backBtn">← Back to Dashboard</button>
+   
   <!-- Call Support / Request Callback -->
   <!-- <section>
     <h2>📞 Request a Call Back</h2>
@@ -111,6 +124,7 @@
 
   <!-- Issue Reporting (Defective Product) -->
   <section>
+    
     <h2>🛠️ Report an Issue</h2>
     <form id="callbackForm">
       <label for="customerName">Your Name</label>
@@ -151,6 +165,8 @@
       <button type="submit">Submit Feedback</button>
     </form>
   </section>
+
+ 
 
   <script>
     // FAQs Toggle
@@ -196,6 +212,12 @@
       this.reset();
       stars.forEach(s => s.classList.remove('selected'));
     });
+
+    // Back to Dashboard
+   document.getElementById("backBtn").addEventListener("click", () => {
+      window.location.href = "index.html";
+    });
+
   </script>
 
 </body>
